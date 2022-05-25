@@ -142,7 +142,8 @@ const app = {
        schema: {
          type: 'string',
          maxLength: 400,
-         title: 'Api Key'
+         title: 'Api Key',
+         description: 'Solicite Api Key ao Suporte da Transportadora'
        },
        hide: true
      },
