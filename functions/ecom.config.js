@@ -152,7 +152,8 @@ const app = {
         type: 'string',
         maxLength: 9,
         pattern: '^[0-9]{5}-?[0-9]{3}$',
-        title: 'CEP de origem'
+        title: 'CEP de origem',
+        description: 'O mesmo configurado na A3 Logistica'
       },
       hide: true
     }
