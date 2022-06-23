@@ -122,6 +122,14 @@ exports.post = ({ appSdk }, req, res) => {
       }
       finalWeight += (quantity * (cubicWeight > 50 ? cubicWeight : physicalWeight))
     })
+    const weightParse = String(finalWeight).replace('.', ',')
+    const totalParse = String(params.subtotal).replace('.', ',')
+    return axios.post(
+      `https://englobasistemas.com.br/financeiro/api/fretes/calcularFrete?apikey=${token}&local=BR&valor=${totalParse}&cep=${destinationZip}&peso=${weightParse}`
+    )
+    .then(result => {
+      console.log('Resultado Cotaacao', JSON.stringify(result))
+    })
   }
 
   // add new shipping service option
