@@ -1,18 +1,21 @@
 {
-  "app_id": 9000,
-  "title": "My Awesome E-Com Plus App",
-  "slug": "my-awesome-ecom-plus-app",
+  "app_id": 114387,
+  "title": "A3 Logística e Transportes",
+  "slug": "a3-logistica-transportes",
   "type": "external",
   "state": "active",
   "authentication": true,
-  "modules": {},
+  "modules": {
+    "calculate_shipping": {
+      "enabled": true,
+      "endpoint": "https://us-central1-ecom-a3logistica.cloudfunctions.net/app/ecom/modules/calculate-shipping"
+    }
+  },
   "auth_scope": {
     "stores/me": [
       "GET"
     ],
-    "procedures": [
-      "POST"
-    ],
+    "procedures": [],
     "products": [],
     "brands": [],
     "categories": [],
@@ -26,6 +29,27 @@
     "products/price": [],
     "products/variations/price": []
   },
-  "auth_callback_uri": "https://us-central1-ecom-app-boilerplate.cloudfunctions.net/app/ecom/auth-callback",
+  "admin_settings": {
+    "token": {
+      "schema": {
+        "type": "string",
+        "maxLength": 400,
+        "title": "Api Key",
+        "description": "Solicite ApiKey ao Suporte da Transportadora"
+      },
+      "hide": true
+    },
+    "zip": {
+      "schema": {
+        "type": "string",
+        "maxLength": 9,
+        "pattern": "^[0-9]{5}-?[0-9]{3}$",
+        "title": "CEP de origem",
+        "description": "O mesmo configurado na A3 Logistica"
+      },
+      "hide": true
+    }
+  },
+  "auth_callback_uri": "https://us-central1-ecom-a3logistica.cloudfunctions.net/app/ecom/auth-callback",
   "version": "1.0.0"
 }
