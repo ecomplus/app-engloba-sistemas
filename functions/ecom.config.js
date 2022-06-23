@@ -143,7 +143,7 @@ const app = {
          type: 'string',
          maxLength: 400,
          title: 'Api Key',
-         description: 'Solicite Api Key ao Suporte da Transportadora'
+         description: 'Solicite ApiKey ao Suporte da Transportadora'
        },
        hide: true
      },
