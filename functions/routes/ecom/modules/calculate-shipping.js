@@ -130,7 +130,7 @@ exports.post = ({ appSdk }, req, res) => {
     .then(result => {
       const { data, status } = result
 
-      if (data && status === 200 && Array.isArray(data)) {
+      if (data && status === 200) {
         // success response
         // parse to E-Com Plus shipping line object
         const price = parseFloat(
