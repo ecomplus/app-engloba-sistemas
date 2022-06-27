@@ -91,13 +91,13 @@ exports.post = ({ appSdk }, req, res) => {
             let dimensionValue
             switch (dimension.unit) {
               case 'cm':
-                dimensionValue = dimension.value
+                dimensionValue = dimension.value / 100
                 break
               case 'm':
-                dimensionValue = dimension.value * 100
+                dimensionValue = dimension.value
                 break
               case 'mm':
-                dimensionValue = dimension.value / 10
+                dimensionValue = dimension.value / 1000
             }
             // add/sum current side to final dimensions object
             if (dimensionValue) {
@@ -128,20 +128,7 @@ exports.post = ({ appSdk }, req, res) => {
       `https://englobasistemas.com.br/financeiro/api/fretes/calcularFrete?apikey=${token}&local=BR&valor=${totalParse}&cep=${destinationZip}&peso=${weightParse}`
     )
     .then(({ data, status }) => {
-      let result
-      if (typeof data === 'string') {
-        try {
-          result = JSON.parse(data)
-        } catch (e) {
-          console.log('> A3 invalid JSON response')
-          return res.status(409).send({
-            error: 'CALCULATE_INVALID_RES',
-            message: data
-          })
-        }
-      } else {
-        result = data
-      }
+      let result = data
 
       if (result && status === 200 && Array.isArray(result)) {
         // success response
