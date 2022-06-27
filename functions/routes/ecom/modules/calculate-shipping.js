@@ -127,30 +127,103 @@ exports.post = ({ appSdk }, req, res) => {
     return axios.post(
       `https://englobasistemas.com.br/financeiro/api/fretes/calcularFrete?apikey=${token}&local=BR&valor=${totalParse}&cep=${destinationZip}&peso=${weightParse}`
     )
-    .then(result => {
-      console.log('Resultado Cotaacao', JSON.stringify(result))
-    })
-  }
-
-  // add new shipping service option
-  response.shipping_services.push({
-    label: appData.label || 'My shipping method',
-    carrier: 'My carrier',
-    shipping_line: {
-      from: appData.from,
-      to: params.to,
-      package: {
-        weight: {
-          value: totalWeight
+    .then(({ data, status }) => {
+      let result
+      if (typeof data === 'string') {
+        try {
+          result = JSON.parse(data)
+        } catch (e) {
+          console.log('> A3 invalid JSON response')
+          return res.status(409).send({
+            error: 'CALCULATE_INVALID_RES',
+            message: data
+          })
         }
-      },
-      price: 10,
-      delivery_time: {
-        days: 3,
-        working_days: true
+      } else {
+        result = data
       }
-    }
-  })
 
-  res.send(response)
+      if (result && status === 200 && Array.isArray(result)) {
+        // success response
+        result.forEach(a3Service => {
+          // parse to E-Com Plus shipping line object
+          const price = parseFloat(
+            a3Service.frete.replace(',', '.')
+          )
+
+          // push shipping service object to response
+          response.shipping_services.push({
+            label: a3Service.descricao_servico,
+            carrier: a3Service.transportadora,
+            service_name: a3Service.transportadora,
+            service_code: a3Service.sigla_base_destino,
+            shipping_line: {
+              from: {
+                ...params.from,
+                zip: originZip
+              },
+              to: params.to,
+              price,
+              total_price: price,
+              discount: 0,
+              delivery_time: {
+                days: parseInt(a3Service.prazo, 10),
+                working_days: true
+              },
+              posting_deadline: {
+                days: 3,
+                ...appData.posting_deadline
+              },
+              flags: ['a3-log-ws', `a3-log-${serviceCode}`.substr(0, 20)]
+            }
+          })
+        })
+        res.send(response)
+      } else {
+        // console.log(data)
+        const err = new Error('Invalid a3-log calculate response')
+        err.response = { data, status }
+        throw err
+      }
+    })
+
+    .catch(err => {
+      let { message, response } = err
+      if (response && response.data) {
+        // try to handle A3 Tecnologia error response
+        const { data } = response
+        let result
+        if (typeof data === 'string') {
+          try {
+            result = JSON.parse(data)
+          } catch (e) {
+          }
+        } else {
+          result = data
+        }
+        console.log('> A3 Tecnologia invalid result:', data)
+        if (result && result.data) {
+          // A3 Tecnologia error message
+          return res.status(409).send({
+            error: 'CALCULATE_FAILED',
+            message: result.data
+          })
+        }
+        message = `${message} (${response.status})`
+      } else {
+        console.error(err)
+      }
+      return res.status(409).send({
+        error: 'CALCULATE_ERR',
+        message
+      })
+    })
+} else {
+  res.status(400).send({
+    error: 'CALCULATE_EMPTY_CART',
+    message: 'Cannot calculate shipping without cart items'
+  })
+}
+
+res.send(response)
 }
