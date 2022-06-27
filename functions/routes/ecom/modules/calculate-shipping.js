@@ -124,46 +124,47 @@ exports.post = ({ appSdk }, req, res) => {
     })
     const weightParse = String(finalWeight).replace('.', ',')
     const totalParse = String(params.subtotal).replace('.', ',')
-    return axios.post(
-      `https://englobasistemas.com.br/financeiro/api/fretes/calcularFrete?apikey=${token}&local=BR&valor=${totalParse}&cep=${destinationZip}&peso=${weightParse}`
-    )
+    const config = {
+      method: 'post',
+      url: `https://englobasistemas.com.br/financeiro/api/fretes/calcularFrete?apikey=${token}&local=BR&valor=${totalParse}&cep=${destinationZip}&peso=${weightParse}`,
+      headers: { }
+    }
+    axios(config)
     .then(result => {
       const { data, status } = result
 
-      if (data && status === 200 && Array.isArray(data)) {
+      if (data && status === 200) {
         // success response
-        data.forEach(a3Service => {
-          // parse to E-Com Plus shipping line object
-          const price = parseFloat(
-            a3Service.frete.replace(',', '.')
-          )
+        // parse to E-Com Plus shipping line object
+        const price = parseFloat(
+          data.frete.replace(',', '.')
+        )
 
-          // push shipping service object to response
-          response.shipping_services.push({
-            label: a3Service.descricao_servico,
-            carrier: a3Service.transportadora,
-            service_name: a3Service.transportadora,
-            service_code: a3Service.sigla_base_destino,
-            shipping_line: {
-              from: {
-                ...params.from,
-                zip: originZip
-              },
-              to: params.to,
-              price,
-              total_price: price,
-              discount: 0,
-              delivery_time: {
-                days: parseInt(a3Service.prazo, 10),
-                working_days: true
-              },
-              posting_deadline: {
-                days: 3,
-                ...appData.posting_deadline
-              },
-              flags: ['a3-log-ws', `a3-log-${serviceCode}`.substr(0, 20)]
-            }
-          })
+        // push shipping service object to response
+        response.shipping_services.push({
+          label: data.descricao_servico,
+          carrier: data.transportadora,
+          service_name: data.transportadora,
+          service_code: data.sigla_base_destino,
+          shipping_line: {
+            from: {
+              ...params.from,
+              zip: originZip
+            },
+            to: params.to,
+            price,
+            total_price: price,
+            discount: 0,
+            delivery_time: {
+              days: parseInt(data.prazo, 10),
+              working_days: true
+            },
+            posting_deadline: {
+              days: 3,
+              ...appData.posting_deadline
+            },
+            flags: ['a3-log-ws', `a3-log-${data.sigla_base_destino}`.substr(0, 20)]
+          }
         })
         res.send(response)
       } else {
@@ -173,7 +174,6 @@ exports.post = ({ appSdk }, req, res) => {
         throw err
       }
     })
-
     .catch(err => {
       let { message, response } = err
       if (response && response.data) {
@@ -187,48 +187,6 @@ exports.post = ({ appSdk }, req, res) => {
           }
         } else {
           result = data
-        }
-        if (data && Array.isArray(data)) {
-          // success response
-          data.forEach(a3Service => {
-            // parse to E-Com Plus shipping line object
-            const price = parseFloat(
-              a3Service.frete.replace(',', '.')
-            )
-  
-            // push shipping service object to response
-            response.shipping_services.push({
-              label: a3Service.descricao_servico,
-              carrier: a3Service.transportadora,
-              service_name: a3Service.transportadora,
-              service_code: a3Service.sigla_base_destino,
-              shipping_line: {
-                from: {
-                  ...params.from,
-                  zip: originZip
-                },
-                to: params.to,
-                price,
-                total_price: price,
-                discount: 0,
-                delivery_time: {
-                  days: parseInt(a3Service.prazo, 10),
-                  working_days: true
-                },
-                posting_deadline: {
-                  days: 3,
-                  ...appData.posting_deadline
-                },
-                flags: ['a3-log-ws', `a3-log-${serviceCode}`.substr(0, 20)]
-              }
-            })
-          })
-          res.send(response)
-        } else {
-          // console.log(data)
-          const err = new Error('Invalid a3-log calculate response')
-          err.response = { data, status }
-          throw err
         }
         console.log('> A3 Tecnologia invalid result:', data)
         if (result && result.data) {
