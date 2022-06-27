@@ -126,8 +126,7 @@ exports.post = ({ appSdk }, req, res) => {
     const totalParse = String(params.subtotal).replace('.', ',')
     const config = {
       method: 'post',
-      url: `https://englobasistemas.com.br/financeiro/api/fretes/calcularFrete?apikey=${token}&local=BR&valor=${totalParse}&cep=${destinationZip}&peso=${weightParse}`,
-      headers: { }
+      url: `https://englobasistemas.com.br/financeiro/api/fretes/calcularFrete?apikey=${token}&local=BR&valor=${totalParse}&cep=${destinationZip}&peso=${weightParse}`
     }
     axios(config)
     .then(result => {
