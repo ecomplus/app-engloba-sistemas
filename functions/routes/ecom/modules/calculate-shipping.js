@@ -124,14 +124,13 @@ exports.post = ({ appSdk }, req, res) => {
     })
     const weightParse = String(finalWeight).replace('.', ',')
     const totalParse = String(params.subtotal).replace('.', ',')
-    const config = {
-      method: 'post',
-      url: `https://englobasistemas.com.br/financeiro/api/fretes/calcularFrete?apikey=${token}&local=BR&valor=${totalParse}&cep=${destinationZip}&peso=${weightParse}`
-    }
-    axios(config)
+    return axios.post(
+      `https://englobasistemas.com.br/financeiro/api/fretes/calcularFrete?apikey=${token}&local=BR&valor=${totalParse}&cep=${destinationZip}&peso=${weightParse}`
+    )
     .then(result => {
       const { data, status } = result
-      if (data && status === 200) {
+
+      if (data && status === 200 && Array.isArray(data)) {
         // success response
         // parse to E-Com Plus shipping line object
         const price = parseFloat(
@@ -163,7 +162,6 @@ exports.post = ({ appSdk }, req, res) => {
             flags: ['a3-log-ws', `a3-log-${data.sigla_base_destino}`.substr(0, 20)]
           }
         })
-        console.log('Olá calculou: ', JSON.stringify(response))
         res.send(response)
       } else {
         // console.log(data)
@@ -172,6 +170,7 @@ exports.post = ({ appSdk }, req, res) => {
         throw err
       }
     })
+
     .catch(err => {
       let { message, response } = err
       if (response && response.data) {
@@ -209,4 +208,6 @@ exports.post = ({ appSdk }, req, res) => {
     message: 'Cannot calculate shipping without cart items'
   })
 }
+
+res.send(response)
 }
