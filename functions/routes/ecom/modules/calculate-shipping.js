@@ -131,14 +131,12 @@ exports.post = ({ appSdk }, req, res) => {
     axios(config)
     .then(result => {
       const { data, status } = result
-
       if (data && status === 200) {
         // success response
         // parse to E-Com Plus shipping line object
         const price = parseFloat(
           data.frete.replace(',', '.')
         )
-
         // push shipping service object to response
         response.shipping_services.push({
           label: data.descricao_servico,
@@ -165,6 +163,7 @@ exports.post = ({ appSdk }, req, res) => {
             flags: ['a3-log-ws', `a3-log-${data.sigla_base_destino}`.substr(0, 20)]
           }
         })
+        console.log('Olá calculou: ', JSON.stringify(response))
         res.send(response)
       } else {
         // console.log(data)
