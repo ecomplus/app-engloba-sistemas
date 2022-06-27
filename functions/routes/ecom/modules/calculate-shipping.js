@@ -174,7 +174,7 @@ exports.post = ({ appSdk }, req, res) => {
       }
     })
 
-    .catch(err => {
+    /* .catch(err => {
       let { message, response } = err
       if (response && response.data) {
         // try to handle A3 Tecnologia error response
@@ -204,7 +204,7 @@ exports.post = ({ appSdk }, req, res) => {
         error: 'CALCULATE_ERR',
         message
       })
-    })
+    }) */
 } else {
   res.status(400).send({
     error: 'CALCULATE_EMPTY_CART',
