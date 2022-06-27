@@ -127,12 +127,12 @@ exports.post = ({ appSdk }, req, res) => {
     return axios.post(
       `https://englobasistemas.com.br/financeiro/api/fretes/calcularFrete?apikey=${token}&local=BR&valor=${totalParse}&cep=${destinationZip}&peso=${weightParse}`
     )
-    .then(({ data, status }) => {
-      let result = data
+    .then(result => {
+      const { data, status } = result
 
-      if (result && status === 200 && Array.isArray(result)) {
+      if (data && status === 200 && Array.isArray(data)) {
         // success response
-        result.forEach(a3Service => {
+        data.forEach(a3Service => {
           // parse to E-Com Plus shipping line object
           const price = parseFloat(
             a3Service.frete.replace(',', '.')
