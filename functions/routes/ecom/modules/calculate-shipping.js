@@ -125,7 +125,10 @@ exports.post = ({ appSdk }, req, res) => {
     const weightParse = String(finalWeight).replace('.', ',')
     const totalParse = String(params.subtotal).replace('.', ',')
     return axios.post(
-      `https://englobasistemas.com.br/financeiro/api/fretes/calcularFrete?apikey=${token}&local=BR&valor=${totalParse}&cep=${destinationZip}&peso=${weightParse}`
+      `https://englobasistemas.com.br/financeiro/api/fretes/calcularFrete?apikey=${token}&local=BR&valor=${totalParse}&cep=${destinationZip}&peso=${weightParse}`,
+      {
+        timeout: (params.is_checkout_confirmation ? 8000 : 5000)
+      }
     )
     .then(result => {
       const { data, status } = result
@@ -138,7 +141,7 @@ exports.post = ({ appSdk }, req, res) => {
         )
         // push shipping service object to response
         response.shipping_services.push({
-          label: data.descricao_servico,
+          label: 'Transportadora A3 Logistica',
           carrier: data.transportadora,
           service_name: data.transportadora,
           service_code: data.sigla_base_destino,
