@@ -66,6 +66,7 @@ exports.post = ({ appSdk }, req, res) => {
     let finalWeight = 0
     params.items.forEach(({ quantity, dimensions, weight }) => {
       let physicalWeight = 0
+      let totalPhysicalWeight = 0
       let cubicWeight = 1
 
       // sum physical weight
@@ -80,6 +81,7 @@ exports.post = ({ appSdk }, req, res) => {
           case 'mg':
             physicalWeight = weight.value / 1000000
         }
+        totalPhysicalWeight += physicalWeight * quantity
       }
 
       // sum total items dimensions to calculate cubic weight
@@ -124,6 +126,8 @@ exports.post = ({ appSdk }, req, res) => {
     })
     const weightParse = String(finalWeight).replace('.', ',')
     const totalParse = String(params.subtotal).replace('.', ',')
+    const endpoint = `https://englobasistemas.com.br/financeiro/api/fretes/calcularFrete?apikey=${token}&local=BR&valor=${totalParse}&cep=${destinationZip}&peso=${weightParse}` 
+    console.log(endpoint)
     return axios.post(
       `https://englobasistemas.com.br/financeiro/api/fretes/calcularFrete?apikey=${token}&local=BR&valor=${totalParse}&cep=${destinationZip}&peso=${weightParse}`,
       {
@@ -132,7 +136,7 @@ exports.post = ({ appSdk }, req, res) => {
     )
     .then(result => {
       const { data, status } = result
-
+      console.log('Resultado', data)
       if (data && status === 200) {
         // success response
         // parse to E-Com Plus shipping line object
@@ -141,7 +145,7 @@ exports.post = ({ appSdk }, req, res) => {
         )
         // push shipping service object to response
         response.shipping_services.push({
-          label: 'Transportadora A3 Logistica',
+          label: data.descricao_servico,
           carrier: data.transportadora,
           service_name: data.transportadora,
           service_code: data.sigla_base_destino,
