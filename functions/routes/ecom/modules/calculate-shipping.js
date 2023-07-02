@@ -136,7 +136,7 @@ exports.post = ({ appSdk }, req, res) => {
     )
     .then(result => {
       const { data, status } = result
-      console.log('Resultado', data)
+      console.log(`Resultado #${storeId}`, data)
       if (data && status === 200) {
         // success response
         // parse to E-Com Plus shipping line object
