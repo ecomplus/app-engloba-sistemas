@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.0.0 (2023-07-04)
+
+
+### Features
+
+* add calculation ([de198a9](https://github.com/ecomplus/application-starter/commit/de198a9fa60442c582a2675dfd79e2f857298986))
+* add configurations to new app ([8da1989](https://github.com/ecomplus/application-starter/commit/8da19898022d8edd787fc0467d679f571d992c03))
+
+
+### Bug Fixes
+
+* **deps:** update all non-major ([c862449](https://github.com/ecomplus/application-starter/commit/c8624498ef50a081e281d26a58fb7aac5a520121))
+* **deps:** update all non-major ([d43af55](https://github.com/ecomplus/application-starter/commit/d43af55805fddab2579c8cc2863ef006be6eff37))
+* **deps:** update all non-major ([7cbbf80](https://github.com/ecomplus/application-starter/commit/7cbbf80e4829ba3b0fd9ee883726966f5c40e357))
+* **deps:** update all non-major ([e457370](https://github.com/ecomplus/application-starter/commit/e45737020e07adcef2363d5332b1eadcc6682c64))
+* **deps:** update all non-major ([0110139](https://github.com/ecomplus/application-starter/commit/01101399cc7cdc4c44c49cf5572ac737a2d50c71))
+* **deps:** update all non-major ([a2476ae](https://github.com/ecomplus/application-starter/commit/a2476ae1e8b4a55b6e06580fa020597c45a9701f))
+* **deps:** update dependency dotenv to ^16.3.1 ([2512d76](https://github.com/ecomplus/application-starter/commit/2512d76fcea4ad7bb3365b30747a984ab27dd3f3))
+* **deps:** update dependency firebase-admin to v11 ([af27706](https://github.com/ecomplus/application-starter/commit/af2770650fd380b81d17ad25f2b370e4a35957ef))
+
 ## [1.0.0-starter.26](https://github.com/ecomplus/application-starter/compare/v1.0.0-starter.25...v1.0.0-starter.26) (2022-02-24)
 
 ## [1.0.0-starter.25](https://github.com/ecomplus/application-starter/compare/v1.0.0-starter.24...v1.0.0-starter.25) (2022-02-24)
