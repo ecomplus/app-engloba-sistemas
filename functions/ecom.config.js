@@ -141,7 +141,7 @@ const app = {
      token: {
        schema: {
          type: 'string',
-         maxLength: 400,
+         maxLength: 600,
          title: 'Api Key',
          description: 'Solicite ApiKey ao Suporte da Transportadora'
        },
