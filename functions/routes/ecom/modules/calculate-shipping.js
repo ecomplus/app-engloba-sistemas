@@ -200,8 +200,8 @@ exports.post = ({ appSdk }, req, res) => {
           }
 
           // change label
-          let label = shipping.descricao_servico
-          if (appData.services && Array.isArray(appData.services) && appData.services.length) {
+          let label = shipping.service_name || shipping.descricao_servico
+          if (Array.isArray(appData.services) && appData.services.length) {
             const service = appData.services.find(service => {
               return service && matchService(service, label)
             })
