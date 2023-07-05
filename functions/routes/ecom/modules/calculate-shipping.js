@@ -42,6 +42,16 @@ exports.post = ({ appSdk }, req, res) => {
   const originZip = params.from
     ? params.from.zip.replace(/\D/g, '')
     : appData.zip ? appData.zip.replace(/\D/g, '') : ''
+  
+  const matchService = (service, name) => {
+    const fields = ['service_name', 'service_code']
+    for (let i = 0; i < fields.length; i++) {
+      if (service[fields[i]]) {
+        return service[fields[i]].trim().toUpperCase() === name.toUpperCase()
+      }
+    }
+    return true
+  }
 
   
   if (!params.to) {
@@ -81,7 +91,7 @@ exports.post = ({ appSdk }, req, res) => {
           case 'mg':
             physicalWeight = weight.value / 1000000
         }
-        totalPhysicalWeight += physicalWeight * quantity
+        totalPhysicalWeight += (physicalWeight * quantity)
       }
 
       // sum total items dimensions to calculate cubic weight
@@ -124,32 +134,36 @@ exports.post = ({ appSdk }, req, res) => {
       }
       finalWeight += (quantity * (cubicWeight > 50 ? cubicWeight : physicalWeight))
     })
-    const weightParse = String(finalWeight).replace('.', ',')
+    const weightParse = String(totalPhysicalWeight).replace('.', ',')
+    const weightCubicParse = String(finalWeight).replace('.', ',')
     const totalParse = String(params.subtotal).replace('.', ',')
-    const endpoint = `https://englobasistemas.com.br/financeiro/api/fretes/calcularFrete?apikey=${token}&local=BR&valor=${totalParse}&cep=${destinationZip}&peso=${weightParse}` 
+    const endpoint = `https://englobasistemas.com.br/financeiro/api/fretes/calcularFrete?apikey=${token}&local=BR&valor=${totalParse}&cep=${destinationZip}&&peso_cubado=${weightCubicParse}&peso=${weightParse}` 
     console.log(endpoint)
     return axios.post(
-      `https://englobasistemas.com.br/financeiro/api/fretes/calcularFrete?apikey=${token}&local=BR&valor=${totalParse}&cep=${destinationZip}&peso=${weightParse}`,
+      `https://englobasistemas.com.br/financeiro/api/fretes/calcularFrete?apikey=${token}&local=BR&valor=${totalParse}&cep=${destinationZip}&&peso_cubado=${weightCubicParse}&peso=${weightParse}`,
       {
         timeout: (params.is_checkout_confirmation ? 8000 : 5000)
       }
     )
     .then(result => {
       const { data, status } = result
-      console.log(`Resultado #${storeId}`, data)
       if (data && status === 200) {
         // success response
         // parse to E-Com Plus shipping line object
+        console.log(`Resultado #${storeId}`, JSON.stringify(data))
+        let shippingResult = []
+        if (Array.isArray(data) && data.length) {
+          shippingResult = [
+            ...data
+          ]
+        } else if (typeof data === 'object') {
+          shippingResult.push(data)
+        }
         const price = parseFloat(
           data.frete.replace(',', '.')
         )
-        // push shipping service object to response
-        response.shipping_services.push({
-          label: data.descricao_servico,
-          carrier: data.transportadora,
-          service_name: data.transportadora,
-          service_code: data.sigla_base_destino,
-          shipping_line: {
+        shippingResult.forEach(shipping => {
+          const shippingLine = {
             from: {
               ...params.from,
               zip: originZip
@@ -159,16 +173,54 @@ exports.post = ({ appSdk }, req, res) => {
             total_price: price,
             discount: 0,
             delivery_time: {
-              days: parseInt(data.prazo, 10),
+              days: parseInt(shipping.prazo, 10),
               working_days: true
             },
             posting_deadline: {
               days: 3,
               ...appData.posting_deadline
             },
-            flags: ['a3-log-ws', `a3-log-${data.sigla_base_destino}`.substr(0, 20)]
+            flags: ['a3-log-ws', `a3-log-${shipping.sigla_base_destino}`.substr(0, 20)]
           }
+
+          // check for default configured additional/discount price
+          if (appData.additional_price) {
+            if (appData.additional_price > 0) {
+              shippingLine.other_additionals = [{
+                tag: 'additional_price',
+                label: 'Adicional padrão',
+                price: appData.additional_price
+              }]
+            } else {
+              // negative additional price to apply discount
+              shippingLine.discount -= appData.additional_price
+            }
+            // update total price
+            shippingLine.total_price += appData.additional_price
+          }
+
+          // change label
+          let label = shippingName
+          if (appData.services && Array.isArray(appData.services) && appData.services.length) {
+            const service = appData.services.find(service => {
+              return service && matchService(service, label)
+            })
+            if (service && service.label) {
+              label = service.label
+            }
+          } else {
+            label = shipping.descricao_servico
+          }
+          // push shipping service object to response
+          response.shipping_services.push({
+            label,
+            carrier: shipping.transportadora,
+            service_name: shipping.transportadora,
+            service_code: shipping.sigla_base_destino,
+            shipping_line: shippingLine
+          })
         })
+        
         res.send(response)
       } else {
         // console.log(data)
