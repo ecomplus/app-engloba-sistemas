@@ -132,13 +132,11 @@ exports.post = ({ appSdk }, req, res) => {
           cubicWeight *= 167
         }
       }
-      finalWeight += (quantity * (cubicWeight > 50 ? cubicWeight : physicalWeight))
+      finalWeight += (quantity * cubicWeight)
     })
     const weightParse = String(totalPhysicalWeight).replace('.', ',')
     const weightCubicParse = String(finalWeight).replace('.', ',')
     const totalParse = String(params.subtotal).replace('.', ',')
-    const endpoint = `https://englobasistemas.com.br/financeiro/api/fretes/calcularFrete?apikey=${token}&local=BR&valor=${totalParse}&cep=${destinationZip}&&peso_cubado=${weightCubicParse}&peso=${weightParse}` 
-    console.log(endpoint)
     return axios.post(
       `https://englobasistemas.com.br/financeiro/api/fretes/calcularFrete?apikey=${token}&local=BR&valor=${totalParse}&cep=${destinationZip}&&peso_cubado=${weightCubicParse}&peso=${weightParse}`,
       {
