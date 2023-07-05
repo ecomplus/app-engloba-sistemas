@@ -74,10 +74,10 @@ exports.post = ({ appSdk }, req, res) => {
 
   if (params.items) {
     let finalWeight = 0
+    let physicalWeight = 0
+    let totalPhysicalWeight = 0
+    let cubicWeight = 1
     params.items.forEach(({ quantity, dimensions, weight }) => {
-      let physicalWeight = 0
-      let totalPhysicalWeight = 0
-      let cubicWeight = 1
 
       // sum physical weight
       if (weight && weight.value) {
@@ -200,7 +200,7 @@ exports.post = ({ appSdk }, req, res) => {
           }
 
           // change label
-          let label = shippingName
+          let label = shipping.descricao_servico
           if (appData.services && Array.isArray(appData.services) && appData.services.length) {
             const service = appData.services.find(service => {
               return service && matchService(service, label)
@@ -208,8 +208,6 @@ exports.post = ({ appSdk }, req, res) => {
             if (service && service.label) {
               label = service.label
             }
-          } else {
-            label = shipping.descricao_servico
           }
           // push shipping service object to response
           response.shipping_services.push({
