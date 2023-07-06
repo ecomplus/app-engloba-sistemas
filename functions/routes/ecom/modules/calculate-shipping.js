@@ -78,7 +78,7 @@ exports.post = ({ appSdk }, req, res) => {
     let totalPhysicalWeight = 0
     let cubicWeight = 1
     let cartSubtotal = 0
-    params.items.forEach(({ quantity, dimensions, weight }) => {
+    params.items.forEach(({ quantity, dimensions, weight }, item) => {
 
       // sum physical weight
       if (weight && weight.value) {
