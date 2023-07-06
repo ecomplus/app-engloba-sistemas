@@ -77,6 +77,7 @@ exports.post = ({ appSdk }, req, res) => {
     let physicalWeight = 0
     let totalPhysicalWeight = 0
     let cubicWeight = 1
+    let cartSubtotal = 0
     params.items.forEach(({ quantity, dimensions, weight }) => {
 
       // sum physical weight
@@ -133,6 +134,7 @@ exports.post = ({ appSdk }, req, res) => {
         }
       }
       finalWeight += (quantity * cubicWeight)
+      cartSubtotal += (quantity * ecomUtils.price(item))
     })
     const weightParse = String(totalPhysicalWeight).replace('.', ',')
     const weightCubicParse = String(finalWeight).replace('.', ',')
@@ -160,6 +162,7 @@ exports.post = ({ appSdk }, req, res) => {
         const price = parseFloat(
           data.frete.replace(',', '.')
         )
+        let lowestPriceShipping
         shippingResult.forEach(shipping => {
           const shippingLine = {
             from: {
@@ -179,6 +182,10 @@ exports.post = ({ appSdk }, req, res) => {
               ...appData.posting_deadline
             },
             flags: ['a3-log-ws', `a3-log-${shipping.sigla_base_destino}`.substr(0, 20)]
+          }
+
+          if (!lowestPriceShipping || lowestPriceShipping.price > price) {
+            lowestPriceShipping = shippingLine
           }
 
           // check for default configured additional/discount price
@@ -217,6 +224,18 @@ exports.post = ({ appSdk }, req, res) => {
           })
         })
         
+        if (lowestPriceShipping) {
+          const { price } = lowestPriceShipping
+          const discount = typeof response.free_shipping_from_value === 'number' &&
+            response.free_shipping_from_value <= cartSubtotal
+            ? price
+            : 0
+          if (discount) {
+            lowestPriceShipping.total_price = price - discount
+            lowestPriceShipping.discount = discount
+          }
+        }
+
         res.send(response)
       } else {
         // console.log(data)
