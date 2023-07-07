@@ -101,9 +101,8 @@ exports.post = ({ appSdk }, req, res) => {
     let totalPhysicalWeight = 0
     let cubicWeight = 1
     let cartSubtotal = 0
-    params.items.forEach(({ quantity, dimensions, weight }, item) => {
-      console.log('item', JSON.stringify(item))
-
+    params.items.forEach(item => {
+      const { quantity, dimensions, weight } = item
       // sum physical weight
       if (weight && weight.value) {
         switch (weight.unit) {
@@ -258,9 +257,7 @@ exports.post = ({ appSdk }, req, res) => {
             lowestPriceShipping.discount = discount
           }
         }
-        console.log('Subtotal carrinho', cartSubtotal)
-        console.log('Free shipping', JSON.stringify(lowestPriceShipping))
-        console.log('Response', JSON.stringify(response))
+
         res.send(response)
       } else {
         // console.log(data)
