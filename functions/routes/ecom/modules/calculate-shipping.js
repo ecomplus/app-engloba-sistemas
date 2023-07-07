@@ -52,7 +52,6 @@ exports.post = ({ appSdk }, req, res) => {
     }
     return true
   }
-
   
   if (!params.to) {
     // just a free shipping preview with no shipping address received
@@ -70,6 +69,21 @@ exports.post = ({ appSdk }, req, res) => {
       message: 'Zip code is unset on app hidden data (merchant must configure the app)'
     })
   }
+
+    // search for configured free shipping rule
+    if (Array.isArray(appData.free_shipping_rules)) {
+      for (let i = 0; i < appData.free_shipping_rules.length; i++) {
+        const rule = appData.free_shipping_rules[i]
+        if (rule && checkZipCode(rule)) {
+          if (!rule.min_amount) {
+            response.free_shipping_from_value = 0
+            break
+          } else if (!(response.free_shipping_from_value <= rule.min_amount)) {
+            response.free_shipping_from_value = rule.min_amount
+          }
+        }
+      }
+    }
 
 
   if (params.items) {
