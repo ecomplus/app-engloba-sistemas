@@ -258,7 +258,9 @@ exports.post = ({ appSdk }, req, res) => {
             lowestPriceShipping.discount = discount
           }
         }
-
+        console.log('shipping line', JSON.stringify(shippingLine))
+        console.log('Free shipping', JSON.stringify(lowestPriceShipping))
+        console.log('Response', JSON.stringify(response))
         res.send(response)
       } else {
         // console.log(data)
