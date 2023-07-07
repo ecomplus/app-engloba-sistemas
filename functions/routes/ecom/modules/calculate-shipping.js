@@ -173,7 +173,6 @@ exports.post = ({ appSdk }, req, res) => {
       if (data && status === 200) {
         // success response
         // parse to E-Com Plus shipping line object
-        console.log(`Resultado #${storeId}`, JSON.stringify(data))
         let shippingResult = []
         if (Array.isArray(data) && data.length) {
           shippingResult = [
@@ -258,7 +257,7 @@ exports.post = ({ appSdk }, req, res) => {
             lowestPriceShipping.discount = discount
           }
         }
-
+        console.log('Subtotal carrinho', cartSubtotal)
         console.log('Free shipping', JSON.stringify(lowestPriceShipping))
         console.log('Response', JSON.stringify(response))
         res.send(response)
