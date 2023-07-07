@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/ecomplus/application-starter/compare/v1.0.0...v1.1.0) (2023-07-07)
+
+
+### Features
+
+* **calculate-shipping:** add free shipping config ([268958e](https://github.com/ecomplus/application-starter/commit/268958ef69040a410bd33ccedd8e5a759b715030))
+* **config:** add additional option and rename it ([f8f4f1e](https://github.com/ecomplus/application-starter/commit/f8f4f1e5634dbc9d992248b5a4227a9836ab3a14))
+
+
+### Bug Fixes
+
+* **calculate-shipping:** get item to calculate subtotal ([4d82a9a](https://github.com/ecomplus/application-starter/commit/4d82a9a79a6a89efaf5ebae1dc9b0efaedb0fd5e))
+* **calculate-shipping:** set let variable ([38637dc](https://github.com/ecomplus/application-starter/commit/38637dcec1ff4da1ec4a2fe325b060b768e96bfb))
+
 ## 1.0.0 (2023-07-04)
 
 
