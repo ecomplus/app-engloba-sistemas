@@ -52,6 +52,15 @@ exports.post = ({ appSdk }, req, res) => {
     }
     return true
   }
+
+  const checkZipCode = rule => {
+    // validate rule zip range
+    if (destinationZip && rule.zip_range) {
+      const { min, max } = rule.zip_range
+      return Boolean((!min || destinationZip >= min) && (!max || destinationZip <= max))
+    }
+    return true
+  }
   
   if (!params.to) {
     // just a free shipping preview with no shipping address received
