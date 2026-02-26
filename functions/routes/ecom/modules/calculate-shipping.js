@@ -101,6 +101,12 @@ exports.post = ({ appSdk }, req, res) => {
     let totalPhysicalWeight = 0
     let cubicWeight = 1
     let cartSubtotal = 0
+    // A3 carrier restrictions
+    const A3_MAX_SIDE_CM = 80
+    const A3_MAX_SUM_DIMENSIONS_CM = 150
+    const A3_MAX_WEIGHT_KG = 25
+    let a3RestrictionViolated = false
+
     params.items.forEach(item => {
       const { quantity, dimensions, weight } = item
       // sum physical weight
@@ -144,6 +150,20 @@ exports.post = ({ appSdk }, req, res) => {
           }
         }
 
+        // Check A3 carrier restrictions per item
+        // No single side can exceed 80 cm and sum of all sides (C+L+A) cannot exceed 150 cm
+        let sumAllSidesCm = 0
+        for (const side in sumDimensions) {
+          const sideCm = sumDimensions[side] * 100
+          if (sideCm > A3_MAX_SIDE_CM) {
+            a3RestrictionViolated = true
+          }
+          sumAllSidesCm += sideCm
+        }
+        if (sumAllSidesCm > A3_MAX_SUM_DIMENSIONS_CM) {
+          a3RestrictionViolated = true
+        }
+
         // calculate cubic weight
         // https://suporte.boxloja.pro/article/82-correios-calculo-frete
         // (C x L x A) / 6.000
@@ -159,6 +179,16 @@ exports.post = ({ appSdk }, req, res) => {
       finalWeight += (quantity * cubicWeight)
       cartSubtotal += (quantity * ecomUtils.price(item))
     })
+
+    // Check A3 weight restriction after summing all items
+    if (totalPhysicalWeight > A3_MAX_WEIGHT_KG) {
+      a3RestrictionViolated = true
+    }
+
+    // If any A3 restriction is violated, return empty shipping services
+    if (a3RestrictionViolated) {
+      return res.send(response)
+    }
     const weightParse = String(totalPhysicalWeight).replace('.', ',')
     const weightCubicParse = String(finalWeight).replace('.', ',')
     const totalParse = String(params.subtotal).replace('.', ',')
